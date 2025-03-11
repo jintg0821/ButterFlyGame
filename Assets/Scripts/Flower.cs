@@ -21,7 +21,12 @@ public class Flower : MonoBehaviour, IDropHandler
 
     public void OnDrop(PointerEventData eventData)
     {
-        throw new System.NotImplementedException();
+        FlowerDrag draggedFlower = eventData.pointerDrag?.GetComponent<FlowerDrag>();
+
+        if (draggedFlower != null)
+        {
+            draggedFlower.SetTargetFlower(this.GetComponent<FlowerDrag>());
+        }
     }
 
     void Start()

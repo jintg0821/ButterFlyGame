@@ -10,6 +10,7 @@ public class BoardSlotGenerator : MonoBehaviour
 
     [Header("꽃 슬롯")]
     public List<GameObject> FlowerSlotList;
+    public List<Transform> FlowerSlotPositionList;
     public GameObject FlowerPrefab;
     public Transform flowerSlotContent;
 
@@ -30,21 +31,20 @@ public class BoardSlotGenerator : MonoBehaviour
 
     public void CreateFlowerSlot()
     {
-        if (FlowerSlotList.Count < 5)
+        while (FlowerSlotList.Count < FlowerSlotPositionList.Count)
         {
-            for (int i = FlowerSlotList.Count; FlowerSlotList.Count < 5; i++)
-            {
-                var Flowerslot = Instantiate(FlowerPrefab, flowerSlotContent);
-                RandomFlowerType(Flowerslot);
-            }
-        }
-    }
+            int index = FlowerSlotList.Count; // 현재 리스트 크기를 인덱스로 사용
 
-    public void RandomFlowerType(GameObject flower)
-    {
-        FlowerType randomType = (FlowerType)Random.Range(0, System.Enum.GetValues(typeof(FlowerType)).Length);
-        flower.gameObject.GetComponent<Flower>().flowerType = randomType;
-        FlowerSlotList.Add(flower);
-        flower.transform.SetParent(flowerSlotContent);
+            var Flowerslot = Instantiate(FlowerPrefab);
+            Flowerslot.transform.SetParent(FlowerSlotPositionList[index], false); // 부모 설정 (false: 로컬 위치 유지)
+            Flowerslot.transform.localPosition = Vector3.zero; // 로컬 포지션을 (0,0,0)으로 설정
+
+            // 랜덤한 꽃 타입 지정
+            FlowerType randomType = (FlowerType)Random.Range(0, System.Enum.GetValues(typeof(FlowerType)).Length);
+            Flowerslot.GetComponent<Flower>().flowerType = randomType;
+
+            // 리스트에 추가
+            FlowerSlotList.Add(Flowerslot);
+        }
     }
 }
