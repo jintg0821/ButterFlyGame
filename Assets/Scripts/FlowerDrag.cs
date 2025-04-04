@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-public class FlowerDrag : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
+public class FlowerDrag : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler, IDropHandler
 {
     private Transform previousParent;
     private RectTransform rect;
@@ -57,6 +57,16 @@ public class FlowerDrag : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDr
         canvasGroup.alpha = 1f;
         canvasGroup.blocksRaycasts = true;
         targetFlower = null; // 초기화
+    }
+
+    public void OnDrop(PointerEventData eventData)
+    {
+        FlowerDrag draggedFlower = eventData.pointerDrag?.GetComponent<FlowerDrag>();
+
+        if (draggedFlower != null)
+        {
+            draggedFlower.SetTargetFlower(this.GetComponent<FlowerDrag>());
+        }
     }
 
     public void SetTargetFlower(FlowerDrag flower)

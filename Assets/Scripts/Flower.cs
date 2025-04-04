@@ -15,19 +15,9 @@ public enum FlowerType
     Purple
 }
 
-public class Flower : MonoBehaviour, IDropHandler
+public class Flower : MonoBehaviour
 {
     public FlowerType flowerType;
-
-    public void OnDrop(PointerEventData eventData)
-    {
-        FlowerDrag draggedFlower = eventData.pointerDrag?.GetComponent<FlowerDrag>();
-
-        if (draggedFlower != null)
-        {
-            draggedFlower.SetTargetFlower(this.GetComponent<FlowerDrag>());
-        }
-    }
 
     void Start()
     {
