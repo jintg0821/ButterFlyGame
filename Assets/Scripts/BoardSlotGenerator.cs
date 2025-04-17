@@ -7,6 +7,7 @@ public class BoardSlotGenerator : MonoBehaviour
     [Header("보드 슬롯")]
     public GameObject boardSlotPrefab;
     public Transform boardSlotContent;
+    public List<Transform> boardSlots = new List<Transform>();
 
     [Header("꽃 슬롯")]
     public List<GameObject> FlowerSlotList;
@@ -22,29 +23,44 @@ public class BoardSlotGenerator : MonoBehaviour
 
     public void CreateBoardSlot()
     {
+        boardSlots.Clear();
+
         for (int i = 0; i < 25; i++)
         {
             var boardSlot = Instantiate(boardSlotPrefab, boardSlotContent);
             boardSlot.transform.SetParent(boardSlotContent);
+            boardSlots.Add(boardSlot.transform);
         }
     }
 
     public void CreateFlowerSlot()
     {
-        while (FlowerSlotList.Count < FlowerSlotPositionList.Count)
+        for (int i = 0; i < FlowerSlotPositionList.Count; i++)
         {
-            int index = FlowerSlotList.Count; // 현재 리스트 크기를 인덱스로 사용
+            Transform slotTransform = FlowerSlotPositionList[i];
 
-            var Flowerslot = Instantiate(FlowerPrefab);
-            Flowerslot.transform.SetParent(FlowerSlotPositionList[index], false); // 부모 설정 (false: 로컬 위치 유지)
-            Flowerslot.transform.localPosition = Vector3.zero; // 로컬 포지션을 (0,0,0)으로 설정
+            // 슬롯이 비어있으면 꽃 생성
+            if (slotTransform.childCount == 0)
+            {
+                var flower = Instantiate(FlowerPrefab);
+                flower.transform.SetParent(slotTransform, false);
+                flower.transform.localPosition = Vector3.zero;
 
-            // 랜덤한 꽃 타입 지정
-            FlowerType randomType = (FlowerType)Random.Range(0, System.Enum.GetValues(typeof(FlowerType)).Length);
-            Flowerslot.GetComponent<Flower>().flowerType = randomType;
+                // 랜덤한 꽃 타입 지정
+                FlowerType randomType = (FlowerType)Random.Range(0, System.Enum.GetValues(typeof(FlowerType)).Length);
+                flower.GetComponent<Flower>().flowerType = randomType;
 
-            // 리스트에 추가
-            FlowerSlotList.Add(Flowerslot);
+                FlowerSlotList.Add(flower);
+            }
+        }
+    }
+
+
+    public void RemoveFlower(GameObject flower)
+    {
+        if (FlowerSlotList.Contains(flower))
+        {
+            FlowerSlotList.Remove(flower);
         }
     }
 }

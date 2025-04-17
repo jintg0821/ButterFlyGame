@@ -47,9 +47,4 @@ public class Flower : MonoBehaviour
                 break;
         }
     }
-    
-    void Update()
-    {
-        
-    }
 }

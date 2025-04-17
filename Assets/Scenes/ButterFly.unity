@@ -133,6 +133,7 @@ GameObject:
   m_Component:
   - component: {fileID: 182833050}
   - component: {fileID: 182833049}
+  - component: {fileID: 182833051}
   m_Layer: 0
   m_Name: GameObject
   m_TagString: Untagged
@@ -154,6 +155,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   boardSlotPrefab: {fileID: 5089826332395467639, guid: 2dbc4cd4c45264dc4922f2dc063831d7, type: 3}
   boardSlotContent: {fileID: 1057358079}
+  boardSlots: []
   FlowerSlotList: []
   FlowerSlotPositionList:
   - {fileID: 1574547288}
@@ -178,6 +180,21 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &182833051
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 182833048}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 99d94191c4c724a558bb93a3986f095e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  boardSlotGenerator: {fileID: 182833049}
+  bingoText: {fileID: 1720404973}
+  scoreText: {fileID: 0}
 --- !u!1 &410192373
 GameObject:
   m_ObjectHideFlags: 0
@@ -1122,7 +1139,6 @@ GameObject:
   - component: {fileID: 1057358082}
   - component: {fileID: 1057358081}
   - component: {fileID: 1057358080}
-  - component: {fileID: 1057358083}
   m_Layer: 5
   m_Name: FlowerBoard
   m_TagString: Untagged
@@ -1211,18 +1227,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1057358078}
   m_CullTransparentMesh: 1
---- !u!114 &1057358083
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1057358078}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 99d94191c4c724a558bb93a3986f095e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &1069857885
 GameObject:
   m_ObjectHideFlags: 0

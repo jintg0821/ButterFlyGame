@@ -10,12 +10,14 @@ public class FlowerDrag : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDr
     private Transform canvas;
     private CanvasGroup canvasGroup;
     private FlowerDrag targetFlower;
+    private BoardSlotGenerator boardSlotGenerator;
 
     void Start()
     {
         canvas = FindObjectOfType<Canvas>().transform;
         rect = GetComponent<RectTransform>();
         canvasGroup = GetComponent<CanvasGroup>();
+        boardSlotGenerator = FindObjectOfType<BoardSlotGenerator>();
     }
 
     public void OnBeginDrag(PointerEventData eventData)
@@ -36,38 +38,57 @@ public class FlowerDrag : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDr
 
     public void OnEndDrag(PointerEventData eventData)
     {
-        if (targetFlower != null)
+        Transform dropTarget = eventData.pointerEnter?.transform;
+
+        // 👉 빈 보드 슬롯일 때만 드롭 허용
+        if (dropTarget != null && dropTarget.CompareTag("BoardSlot") && dropTarget.childCount == 0)
         {
-            // 서로 부모 위치 변경 (위치 교체)
+            transform.SetParent(dropTarget);
+            transform.localPosition = Vector3.zero;
+
+            boardSlotGenerator.RemoveFlower(gameObject);
+            boardSlotGenerator.CreateFlowerSlot();
+
+            FindObjectOfType<GameBoard>()?.CheckBingo();
+        }
+        else if (targetFlower != null)
+        {
+            // 꽃끼리 교환
             Transform targetParent = targetFlower.transform.parent;
             targetFlower.transform.SetParent(previousParent);
             transform.SetParent(targetParent);
 
-            // 위치 초기화
             targetFlower.transform.localPosition = Vector3.zero;
             transform.localPosition = Vector3.zero;
         }
         else
         {
-            // 원래 위치로 되돌리기
+            // 👉 그 외 경우: 원래 자리로 복귀
             transform.SetParent(previousParent);
             transform.localPosition = Vector3.zero;
         }
 
         canvasGroup.alpha = 1f;
         canvasGroup.blocksRaycasts = true;
-        targetFlower = null; // 초기화
+        targetFlower = null;
     }
 
     public void OnDrop(PointerEventData eventData)
     {
+        // 드래그된 꽃 가져오기
         FlowerDrag draggedFlower = eventData.pointerDrag?.GetComponent<FlowerDrag>();
 
+        // 👇 자신과 draggedFlower 모두 "FlowerSlot"에 있을 경우에만 교환 허용
         if (draggedFlower != null)
         {
-            draggedFlower.SetTargetFlower(this.GetComponent<FlowerDrag>());
+            // 보드 슬롯에는 꽃끼리 교환 안 됨
+            if (transform.parent.CompareTag("FlowerSlot") && draggedFlower.previousParent.CompareTag("FlowerSlot"))
+            {
+                draggedFlower.SetTargetFlower(this);
+            }
         }
     }
+
 
     public void SetTargetFlower(FlowerDrag flower)
     {
