@@ -49,8 +49,8 @@ public class FlowerDrag : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDr
     {
         Transform dropTarget = eventData.pointerEnter?.transform;
 
-        // 👉 빈 보드 슬롯일 때만 드롭 허용
-        if (dropTarget != null && dropTarget.CompareTag("BoardSlot") && dropTarget.childCount == 0)
+        // 👉 빈 보드 슬롯에 드롭, 하지만 이미 보드에 있는 꽃은 막기
+        if (dropTarget != null && dropTarget.CompareTag("BoardSlot") && dropTarget.childCount == 0 && !CompareTag("BoardFlower"))
         {
             transform.SetParent(dropTarget);
             transform.localPosition = Vector3.zero;
@@ -82,6 +82,7 @@ public class FlowerDrag : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDr
         canvasGroup.blocksRaycasts = true;
         targetFlower = null;
     }
+
 
     public void OnDrop(PointerEventData eventData)
     {
