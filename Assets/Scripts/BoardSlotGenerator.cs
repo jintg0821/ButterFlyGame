@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class BoardSlotGenerator : MonoBehaviour
 {
+    public Transform flowerSpawnpoint;
+
     [Header("보드 슬롯")]
     public GameObject boardSlotPrefab;
     public Transform boardSlotContent;
@@ -44,7 +46,6 @@ public class BoardSlotGenerator : MonoBehaviour
             {
                 var flower = Instantiate(FlowerPrefab);
                 flower.transform.SetParent(slotTransform, false);
-                flower.transform.localPosition = Vector3.zero;
                 flower.transform.tag = "SlotFlower";
 
                 // 랜덤한 꽃 타입 지정
@@ -52,10 +53,11 @@ public class BoardSlotGenerator : MonoBehaviour
                 flower.GetComponent<Flower>().flowerType = randomType;
 
                 FlowerSlotList.Add(flower);
+
+                StartCoroutine(SmoothMoveToCenter(flower.transform));
             }
         }
     }
-
 
     public void RemoveFlower(GameObject flower)
     {
@@ -64,4 +66,23 @@ public class BoardSlotGenerator : MonoBehaviour
             FlowerSlotList.Remove(flower);
         }
     }
+    private IEnumerator SmoothMoveToCenter(Transform flower)
+    {
+        Vector3 startLocalPos = flower.parent.InverseTransformPoint(flowerSpawnpoint.position);
+        Vector3 targetLocalPos = Vector3.zero;
+        float duration = 0.5f;
+        float elapsed = 0f;
+
+        flower.localPosition = startLocalPos;
+
+        while (elapsed < duration)
+        {
+            flower.localPosition = Vector3.Lerp(startLocalPos, targetLocalPos, elapsed / duration);
+            elapsed += Time.deltaTime;
+            yield return null;
+        }
+
+        flower.localPosition = targetLocalPos;
+    }
+
 }
