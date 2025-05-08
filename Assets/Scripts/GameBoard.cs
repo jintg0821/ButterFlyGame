@@ -7,9 +7,17 @@ public class GameBoard : MonoBehaviour
 {
     public BoardSlotGenerator boardSlotGenerator;
     private const int GRID_SIZE = 5;
-    int bingoCount;
+    private int bingoCount;
+    private int score;
     public TextMeshProUGUI bingoText;
     public TextMeshProUGUI scoreText;
+
+    private ItemManager itemManager;
+
+    void Start()
+    {
+        itemManager = GetComponent<ItemManager>();
+    }
 
     public void CheckBingo()
     {
@@ -40,10 +48,13 @@ public class GameBoard : MonoBehaviour
             if (isBingo)
             {
                 bingoCount++;
+                score += 250;
+                scoreText.text = $"Score : {score}";
                 for (int col = 0; col < GRID_SIZE; col++)
                 {
                     RemoveFlowerFromSlot(slots[startIndex + col]);
                 }
+                RandomItem();
             }
         }
 
@@ -66,10 +77,67 @@ public class GameBoard : MonoBehaviour
             if (isBingo)
             {
                 bingoCount++;
+                score += 250;
+                scoreText.text = $"Score : {score}";
                 for (int row = 0; row < GRID_SIZE; row++)
                 {
                     RemoveFlowerFromSlot(slots[row * GRID_SIZE + col]);
                 }
+                RandomItem();
+            }
+        }
+
+        // 대각선 ↘ 검사
+        FlowerType? diagType1 = GetFlowerType(slots[0]);
+        if (diagType1 != null)
+        {
+            bool isBingo = true;
+            for (int i = 1; i < GRID_SIZE; i++)
+            {
+                if (GetFlowerType(slots[i * (GRID_SIZE + 1)]) != diagType1)
+                {
+                    isBingo = false;
+                    break;
+                }
+            }
+
+            if (isBingo)
+            {
+                bingoCount++;
+                score += 250;
+                scoreText.text = $"Score : {score}";
+                for (int i = 0; i < GRID_SIZE; i++)
+                {
+                    RemoveFlowerFromSlot(slots[i * (GRID_SIZE + 1)]);
+                }
+                RandomItem();
+            }
+        }
+
+        // 대각선 ↙ 검사
+        FlowerType? diagType2 = GetFlowerType(slots[GRID_SIZE - 1]);
+        if (diagType2 != null)
+        {
+            bool isBingo = true;
+            for (int i = 1; i < GRID_SIZE; i++)
+            {
+                if (GetFlowerType(slots[i * (GRID_SIZE - 1)]) != diagType2)
+                {
+                    isBingo = false;
+                    break;
+                }
+            }
+
+            if (isBingo)
+            {
+                bingoCount++;
+                score += 250;
+                scoreText.text = $"Score : {score}";
+                for (int i = 0; i < GRID_SIZE; i++)
+                {
+                    RemoveFlowerFromSlot(slots[i * (GRID_SIZE - 1)]);
+                }
+                RandomItem();
             }
         }
 
@@ -83,7 +151,7 @@ public class GameBoard : MonoBehaviour
         return flower?.flowerType;
     }
 
-    private void RemoveFlowerFromSlot(Transform slot)
+    public void RemoveFlowerFromSlot(Transform slot)
     {
         if (slot.childCount > 0)
         {
@@ -91,4 +159,20 @@ public class GameBoard : MonoBehaviour
         }
     }
 
+    private void RandomItem()
+    {
+        float rand = Random.value;
+
+        if (rand <= 0.1f)
+        {
+            if (Random.value < 0.5f)
+            {
+                itemManager.IncreaseRemove();
+            }
+            else
+            {
+                itemManager.IncreaseChange();
+            }
+        }
+    }
 }

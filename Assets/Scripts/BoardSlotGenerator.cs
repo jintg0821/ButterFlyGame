@@ -45,6 +45,7 @@ public class BoardSlotGenerator : MonoBehaviour
                 var flower = Instantiate(FlowerPrefab);
                 flower.transform.SetParent(slotTransform, false);
                 flower.transform.localPosition = Vector3.zero;
+                flower.transform.tag = "SlotFlower";
 
                 // 랜덤한 꽃 타입 지정
                 FlowerType randomType = (FlowerType)Random.Range(0, System.Enum.GetValues(typeof(FlowerType)).Length);

@@ -2,15 +2,22 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
-public class FlowerDrag : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler, IDropHandler
+public class FlowerDrag : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler, IDropHandler, IPointerClickHandler
 {
     private Transform previousParent;
     private RectTransform rect;
     private Transform canvas;
     private CanvasGroup canvasGroup;
     private FlowerDrag targetFlower;
+    public Image changeFlowerImage;
+
     private BoardSlotGenerator boardSlotGenerator;
+    private ItemManager itemManager;
+    private GameBoard gameBoard;
+
+    private static FlowerDrag selectedForChange = null;
 
     void Start()
     {
@@ -18,6 +25,8 @@ public class FlowerDrag : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDr
         rect = GetComponent<RectTransform>();
         canvasGroup = GetComponent<CanvasGroup>();
         boardSlotGenerator = FindObjectOfType<BoardSlotGenerator>();
+        itemManager = FindObjectOfType<ItemManager>();
+        gameBoard = FindObjectOfType<GameBoard>();
     }
 
     public void OnBeginDrag(PointerEventData eventData)
@@ -45,6 +54,7 @@ public class FlowerDrag : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDr
         {
             transform.SetParent(dropTarget);
             transform.localPosition = Vector3.zero;
+            transform.tag = "BoardFlower";
 
             boardSlotGenerator.RemoveFlower(gameObject);
             boardSlotGenerator.CreateFlowerSlot();
@@ -89,9 +99,60 @@ public class FlowerDrag : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDr
         }
     }
 
-
     public void SetTargetFlower(FlowerDrag flower)
     {
         targetFlower = flower;
     }
+
+    public void OnPointerClick(PointerEventData eventData)
+    {
+        if (itemManager != null)
+        {
+            if (itemManager.itemType == ItemType.Remove && transform.CompareTag("BoardFlower"))
+            {
+                if (transform.parent != null)
+                {
+                    gameBoard.RemoveFlowerFromSlot(transform.parent);
+                    itemManager.DecreaseRemove();
+                    itemManager.itemType = ItemType.None;
+                }
+            }
+
+            else if (itemManager.itemType == ItemType.Change && transform.CompareTag("BoardFlower"))
+            {
+                if (selectedForChange == null)
+                {
+                    // 첫 번째 꽃 선택
+                    selectedForChange = this;
+                    changeFlowerImage.gameObject.SetActive(true);
+                }
+                else if (selectedForChange != this)
+                {
+                    // 두 번째 꽃 선택 - 두 꽃을 서로 교환
+                    Transform parentA = selectedForChange.transform.parent;
+                    Transform parentB = transform.parent;
+
+                    selectedForChange.transform.SetParent(parentB);
+                    transform.SetParent(parentA);
+
+                    selectedForChange.transform.localPosition = Vector3.zero;
+                    transform.localPosition = Vector3.zero;
+
+                    if (selectedForChange.changeFlowerImage != null)
+                        selectedForChange.changeFlowerImage.gameObject.SetActive(false);
+                    if (changeFlowerImage != null)
+                        changeFlowerImage.gameObject.SetActive(false);
+
+                    itemManager.DecreaseChange();
+                    // 초기화
+                    selectedForChange = null;
+                    itemManager.itemType = ItemType.None;
+
+                    gameBoard.CheckBingo();
+                }
+
+            }
+        }
+    }
+
 }

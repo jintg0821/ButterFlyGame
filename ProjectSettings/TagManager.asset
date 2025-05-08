@@ -6,6 +6,8 @@ TagManager:
   tags:
   - BoardSlot
   - FlowerSlot
+  - BoardFlower
+  - SlotFlower
   layers:
   - Default
   - TransparentFX
